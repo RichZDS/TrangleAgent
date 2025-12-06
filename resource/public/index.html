@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <title>GoFrame WebSocket Echo Server</title>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+        <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+        <style>
+            body {
+                padding: 20px;
+            }
+            #divShow {
+                max-height: 400px;
+                overflow-y: auto;
+                margin-bottom: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>GoFrame WebSocket Echo Server</h2>
+            <div class="list-group" id="divShow"></div>
+            <div>
+                <div><input class="form-control" id="txtContent" autofocus placeholder="输入要发送的内容..."></div>
+                <div><button class="btn btn-primary" id="btnSend" style="margin-top:15px">发送</button></div>
+            </div>
+        </div>
+    </body>
+</html>
+
+<script type="application/javascript">
+    function showInfo(content) {
+        $("<div class=\"list-group-item list-group-item-info\">" + content + "</div>").appendTo("#divShow")
+        $("#divShow").scrollTop($("#divShow")[0].scrollHeight);
+    }
+    function showWaring(content) {
+        $("<div class=\"list-group-item list-group-item-warning\">" + content + "</div>").appendTo("#divShow")
+        $("#divShow").scrollTop($("#divShow")[0].scrollHeight);
+    }
+    function showSuccess(content) {
+        $("<div class=\"list-group-item list-group-item-success\">" + content + "</div>").appendTo("#divShow")
+        $("#divShow").scrollTop($("#divShow")[0].scrollHeight);
+    }
+    function showError(content) {
+        $("<div class=\"list-group-item list-group-item-danger\">" + content + "</div>").appendTo("#divShow")
+        $("#divShow").scrollTop($("#divShow")[0].scrollHeight);
+    }
+
+    $(function () {
+        // 获取当前页面的协议和主机
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = window.location.host;
+        const url = protocol + "//" + host + "/ws";
+        let ws  = new WebSocket(url);
+        
+        try {
+            // WebSocket 连接成功
+            ws.onopen = function () {
+                showInfo("WebSocket 服务器 [" + url + "] 连接成功！");
+            };
+            // WebSocket 连接关闭
+            ws.onclose = function () {
+                if (ws) {
+                    ws.close();
+                    ws = null;
+                }
+                showError("WebSocket 服务器 [" + url + "] 连接已关闭！");
+            };
+            // WebSocket 连接错误
+            ws.onerror = function () {
+                if (ws) {
+                    ws.close();
+                    ws = null;
+                }
+                showError("WebSocket 服务器 [" + url + "] 连接错误！");
+            };
+            // WebSocket 响应消息
+            ws.onmessage = function (result) {
+                showWaring(" > " + result.data);
+            };
+        } catch (e) {
+            alert(e.message);
+        }
+
+        // 点击发送消息
+        $("#btnSend").on("click", function () {
+            if (ws == null) {
+                showError("WebSocket 服务器 [" + url + "] 连接失败，请刷新页面！");
+                return;
+            }
+            const content = $.trim($("#txtContent").val()).replace(/[\n]/g, "");
+            if (content.length <= 0) {
+                alert("请输入要发送的内容！");
+                return;
+            }
+            $("#txtContent").val("")
+            showSuccess("发送: " + content);
+            ws.send(content);
+        });
+
+        // 回车发送消息
+        $("#txtContent").on("keydown", function (event) {
+            if (event.keyCode === 13) {
+                $("#btnSend").trigger("click");
+            }
+        });
+    })
+</script>
+
