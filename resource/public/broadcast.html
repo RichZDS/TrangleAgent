@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <title>WebSocket 广播测试</title>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+        <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+        <style>
+            body {
+                padding: 20px;
+                background-color: #f5f5f5;
+            }
+            .container {
+                background-color: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            h2 {
+                color: #333;
+                margin-bottom: 20px;
+            }
+            #divShow {
+                max-height: 500px;
+                overflow-y: auto;
+                margin-bottom: 20px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 10px;
+                background-color: #fafafa;
+            }
+            .client-info {
+                background-color: #e8f4f8;
+                padding: 8px;
+                margin-bottom: 10px;
+                border-radius: 4px;
+                font-size: 12px;
+                color: #666;
+            }
+            .message-item {
+                margin-bottom: 8px;
+                padding: 8px;
+                border-radius: 4px;
+                word-wrap: break-word;
+            }
+            .timestamp {
+                font-size: 11px;
+                color: #999;
+                margin-right: 10px;
+            }
+            .user-input {
+                margin-top: 15px;
+            }
+            .status-badge {
+                display: inline-block;
+                padding: 4px 8px;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-left: 10px;
+            }
+            .status-connected {
+                background-color: #5cb85c;
+                color: white;
+            }
+            .status-disconnected {
+                background-color: #d9534f;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>
+                WebSocket 广播测试
+                <span id="statusBadge" class="status-badge status-disconnected">未连接</span>
+            </h2>
+            <div class="client-info" id="clientInfo">
+                客户端ID: <span id="clientId"></span> | 连接状态: <span id="connectionStatus">等待连接...</span>
+            </div>
+            <div class="list-group" id="divShow"></div>
+            <div class="user-input">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="txtContent" autofocus placeholder="输入要广播的消息...">
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" id="btnSend">发送广播</button>
+                    </span>
+                </div>
+                <small class="text-muted" style="display: block; margin-top: 10px;">
+                    提示：打开多个浏览器窗口或标签页，在一个窗口中发送消息，所有窗口都会收到广播消息
+                </small>
+            </div>
+        </div>
+    </body>
+</html>
+
+<script type="application/javascript">
+    // 生成客户端ID
+    const clientId = 'Client-' + Math.random().toString(36).substr(2, 9);
+    document.getElementById('clientId').textContent = clientId;
+
+    function showInfo(content) {
+        const timestamp = new Date().toLocaleTimeString();
+        const html = '<div class="list-group-item list-group-item-info message-item">' +
+            '<span class="timestamp">[' + timestamp + ']</span>' + content + '</div>';
+        $(html).appendTo("#divShow");
+        $("#divShow").scrollTop($("#divShow")[0].scrollHeight);
+    }
+
+    function showWarning(content) {
+        const timestamp = new Date().toLocaleTimeString();
+        const html = '<div class="list-group-item list-group-item-warning message-item">' +
+            '<span class="timestamp">[' + timestamp + ']</span>' + content + '</div>';
+        $(html).appendTo("#divShow");
+        $("#divShow").scrollTop($("#divShow")[0].scrollHeight);
+    }
+
+    function showSuccess(content) {
+        const timestamp = new Date().toLocaleTimeString();
+        const html = '<div class="list-group-item list-group-item-success message-item">' +
+            '<span class="timestamp">[' + timestamp + ']</span>' + content + '</div>';
+        $(html).appendTo("#divShow");
+        $("#divShow").scrollTop($("#divShow")[0].scrollHeight);
+    }
+
+    function showError(content) {
+        const timestamp = new Date().toLocaleTimeString();
+        const html = '<div class="list-group-item list-group-item-danger message-item">' +
+            '<span class="timestamp">[' + timestamp + ']</span>' + content + '</div>';
+        $(html).appendTo("#divShow");
+        $("#divShow").scrollTop($("#divShow")[0].scrollHeight);
+    }
+
+    function updateStatus(connected) {
+        const badge = $('#statusBadge');
+        const status = $('#connectionStatus');
+        if (connected) {
+            badge.removeClass('status-disconnected').addClass('status-connected').text('已连接');
+            status.text('已连接');
+        } else {
+            badge.removeClass('status-connected').addClass('status-disconnected').text('未连接');
+            status.text('未连接');
+        }
+    }
+
+    $(function () {
+        // 获取当前页面的协议和主机
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = window.location.host;
+        const url = protocol + "//" + host + "/ws";
+        let ws = new WebSocket(url);
+
+        try {
+            // WebSocket 连接成功
+            ws.onopen = function () {
+                updateStatus(true);
+                showInfo("✅ WebSocket 服务器 [" + url + "] 连接成功！客户端ID: " + clientId);
+            };
+
+            // WebSocket 连接关闭
+            ws.onclose = function () {
+                updateStatus(false);
+                if (ws) {
+                    ws.close();
+                    ws = null;
+                }
+                showError("❌ WebSocket 服务器 [" + url + "] 连接已关闭！");
+            };
+
+            // WebSocket 连接错误
+            ws.onerror = function () {
+                updateStatus(false);
+                if (ws) {
+                    ws.close();
+                    ws = null;
+                }
+                showError("❌ WebSocket 服务器 [" + url + "] 连接错误！");
+            };
+
+            // WebSocket 响应消息（接收广播）
+            ws.onmessage = function (event) {
+                try {
+                    // 服务端使用 WriteJSON 发送，所以消息是 JSON 字符串
+                    let message = event.data;
+                    // 如果是 JSON 字符串，尝试解析
+                    if (typeof message === 'string' && message.startsWith('"')) {
+                        message = JSON.parse(message);
+                    }
+                    showWarning("📢 收到广播: " + message);
+                } catch (e) {
+                    showWarning("📢 收到广播: " + event.data);
+                }
+            };
+        } catch (e) {
+            alert("连接错误: " + e.message);
+        }
+
+        // 点击发送消息
+        $("#btnSend").on("click", function () {
+            if (ws == null || ws.readyState !== WebSocket.OPEN) {
+                showError("WebSocket 服务器连接失败，请刷新页面！");
+                return;
+            }
+            const content = $.trim($("#txtContent").val());
+            if (content.length <= 0) {
+                alert("请输入要发送的内容！");
+                return;
+            }
+            
+            // 发送 JSON 格式的消息（服务端使用 ReadJSON 读取）
+            try {
+                ws.send(JSON.stringify(content));
+                $("#txtContent").val("");
+                showSuccess("📤 发送广播: " + content);
+            } catch (e) {
+                showError("发送失败: " + e.message);
+            }
+        });
+
+        // 回车发送消息
+        $("#txtContent").on("keydown", function (event) {
+            if (event.keyCode === 13) {
+                $("#btnSend").trigger("click");
+            }
+        });
+    })
+</script>
+

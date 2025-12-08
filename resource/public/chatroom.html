@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>TrangleAgent - 聊天室测试</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .chat-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .chat-messages {
+            flex: 1;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            background-color: #fafafa;
+            min-height: 400px;
+        }
+        .message-item {
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 4px;
+            word-wrap: break-word;
+        }
+        .message-own {
+            background-color: #d4edda;
+            border-left: 3px solid #28a745;
+        }
+        .message-other {
+            background-color: #fff3cd;
+            border-left: 3px solid #ffc107;
+        }
+        .message-system {
+            background-color: #e2e3e5;
+            border-left: 3px solid #6c757d;
+            font-style: italic;
+        }
+        .timestamp {
+            font-size: 11px;
+            color: #999;
+            margin-right: 10px;
+        }
+        .user-info {
+            font-weight: bold;
+            color: #007bff;
+            margin-right: 8px;
+        }
+        .room-info {
+            background-color: #e8f4f8;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .input-group {
+            margin-top: 15px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .status-connected {
+            background-color: #5cb85c;
+            color: white;
+        }
+        .status-disconnected {
+            background-color: #d9534f;
+            color: white;
+        }
+        .sidebar {
+            width: 250px;
+        }
+        .sidebar-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>
+            TrangleAgent 聊天室测试
+            <span id="statusBadge" class="status-badge status-disconnected">未连接</span>
+        </h2>
+        
+        <div class="room-info">
+            <div class="form-group">
+                <label>房间ID:</label>
+                <input type="text" class="form-control" id="roomId" value="room1" placeholder="输入房间ID">
+            </div>
+            <div class="form-group">
+                <label>用户ID:</label>
+                <input type="text" class="form-control" id="userId" value="" placeholder="输入用户ID（留空自动生成）">
+            </div>
+            <button class="btn btn-primary" id="btnConnect">连接聊天室</button>
+            <button class="btn btn-danger" id="btnDisconnect" disabled>断开连接</button>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message-item message-system">
+                    <span class="timestamp">[系统]</span>
+                    等待连接到聊天室...
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="sidebar-card">
+                    <h4>使用说明</h4>
+                    <ul style="font-size: 12px; padding-left: 20px;">
+                        <li>输入房间ID和用户ID</li>
+                        <li>点击"连接聊天室"</li>
+                        <li>打开多个窗口测试</li>
+                        <li>在不同窗口发送消息</li>
+                        <li>所有窗口都会收到广播</li>
+                    </ul>
+                </div>
+                <div class="sidebar-card">
+                    <h4>连接信息</h4>
+                    <div id="connectionInfo" style="font-size: 12px;">
+                        <div>状态: <span id="connStatus">未连接</span></div>
+                        <div>房间: <span id="connRoom">-</span></div>
+                        <div>用户: <span id="connUser">-</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" class="form-control" id="txtMessage" placeholder="输入消息..." disabled>
+            <span class="input-group-btn">
+                <button class="btn btn-primary" id="btnSend" disabled>发送</button>
+            </span>
+        </div>
+    </div>
+</body>
+</html>
+
+<script type="application/javascript">
+    let ws = null;
+    let currentRoomId = '';
+    let currentUserId = '';
+
+    // 生成用户ID
+    function generateUserId() {
+        return 'User-' + Math.random().toString(36).substr(2, 9);
+    }
+
+    // 初始化用户ID
+    $(function() {
+        const userIdInput = $('#userId');
+        if (!userIdInput.val()) {
+            userIdInput.val(generateUserId());
+        }
+    });
+
+    function updateStatus(connected) {
+        const badge = $('#statusBadge');
+        const status = $('#connStatus');
+        if (connected) {
+            badge.removeClass('status-disconnected').addClass('status-connected').text('已连接');
+            status.text('已连接');
+            $('#btnConnect').prop('disabled', true);
+            $('#btnDisconnect').prop('disabled', false);
+            $('#txtMessage').prop('disabled', false);
+            $('#btnSend').prop('disabled', false);
+        } else {
+            badge.removeClass('status-connected').addClass('status-disconnected').text('未连接');
+            status.text('未连接');
+            $('#btnConnect').prop('disabled', false);
+            $('#btnDisconnect').prop('disabled', true);
+            $('#txtMessage').prop('disabled', true);
+            $('#btnSend').prop('disabled', true);
+        }
+    }
+
+    function addMessage(message, type, userId) {
+        const timestamp = new Date().toLocaleTimeString();
+        const messagesDiv = $('#chatMessages');
+        
+        let messageClass = 'message-other';
+        let displayUserId = userId || '系统';
+        
+        if (type === 'own') {
+            messageClass = 'message-own';
+        } else if (type === 'system') {
+            messageClass = 'message-system';
+            displayUserId = '系统';
+        }
+        
+        const html = '<div class="message-item ' + messageClass + '">' +
+            '<span class="timestamp">[' + timestamp + ']</span>' +
+            '<span class="user-info">' + displayUserId + ':</span>' +
+            message +
+            '</div>';
+        
+        messagesDiv.append(html);
+        messagesDiv.scrollTop(messagesDiv[0].scrollHeight);
+    }
+
+    function connect() {
+        const roomId = $('#roomId').val().trim();
+        const userId = $('#userId').val().trim() || generateUserId();
+        
+        if (!roomId) {
+            alert('请输入房间ID！');
+            return;
+        }
+        
+        if (!userId) {
+            $('#userId').val(generateUserId());
+            return;
+        }
+
+        currentRoomId = roomId;
+        currentUserId = userId;
+        
+        $('#connRoom').text(roomId);
+        $('#connUser').text(userId);
+
+        // 获取当前页面的协议和主机
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = window.location.host;
+        const url = protocol + "//" + host + "/ws/chat?roomId=" + encodeURIComponent(roomId);
+
+        try {
+            ws = new WebSocket(url);
+
+            ws.onopen = function() {
+                updateStatus(true);
+                addMessage('成功连接到聊天室: ' + roomId, 'system');
+                
+                // 发送加入消息
+                const joinMsg = {
+                    roomId: roomId,
+                    userId: userId,
+                    message: userId + ' 加入了聊天室',
+                    type: 'join'
+                };
+                ws.send(JSON.stringify(joinMsg));
+            };
+
+            ws.onclose = function() {
+                updateStatus(false);
+                addMessage('连接已断开', 'system');
+                ws = null;
+            };
+
+            ws.onerror = function() {
+                updateStatus(false);
+                addMessage('连接错误', 'system');
+            };
+
+            ws.onmessage = function(event) {
+                try {
+                    // 解析收到的消息
+                    const data = JSON.parse(event.data);
+                    if (data.userId === currentUserId) {
+                        addMessage(data.message, 'own', data.userId);
+                    } else {
+                        addMessage(data.message, 'other', data.userId);
+                    }
+                } catch (e) {
+                    // 如果不是JSON，直接显示
+                    addMessage(event.data, 'other');
+                }
+            };
+        } catch (e) {
+            alert('连接错误: ' + e.message);
+        }
+    }
+
+    function disconnect() {
+        if (ws) {
+            // 发送离开消息
+            const leaveMsg = {
+                roomId: currentRoomId,
+                userId: currentUserId,
+                message: currentUserId + ' 离开了聊天室',
+                type: 'leave'
+            };
+            try {
+                ws.send(JSON.stringify(leaveMsg));
+            } catch (e) {
+                console.error('发送离开消息失败:', e);
+            }
+            ws.close();
+            ws = null;
+        }
+        updateStatus(false);
+        addMessage('已断开连接', 'system');
+    }
+
+    function sendMessage() {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            alert('未连接到聊天室！');
+            return;
+        }
+
+        const message = $('#txtMessage').val().trim();
+        if (!message) {
+            alert('请输入消息！');
+            return;
+        }
+
+        const chatMsg = {
+            roomId: currentRoomId,
+            userId: currentUserId,
+            message: message,
+            type: 'message'
+        };
+
+        try {
+            ws.send(JSON.stringify(chatMsg));
+            $('#txtMessage').val('');
+        } catch (e) {
+            alert('发送失败: ' + e.message);
+        }
+    }
+
+    // 绑定事件
+    $(function() {
+        $('#btnConnect').on('click', connect);
+        $('#btnDisconnect').on('click', disconnect);
+        $('#btnSend').on('click', sendMessage);
+        
+        $('#txtMessage').on('keydown', function(event) {
+            if (event.keyCode === 13) {
+                sendMessage();
+            }
+        });
+    });
+</script>
+
