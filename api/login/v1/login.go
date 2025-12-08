@@ -33,11 +33,44 @@ type LogoutRes struct {
 }
 
 // 用邮箱登录
-type LoginByEmailRequest struct {
+type LoginByEmailReq struct {
+	g.Meta `path:"/login/email" method:"post" tags:"Login" summary:"User Login By Email"`
+	Email  string `json:"email" v:"email#邮箱格式不正确"`
+}
+
+type LoginByEmailRes struct {
+	Token string `json:"token" dc:"JWT token for authentication"`
 	Email string `json:"email"`
 }
 
-type LoginByVerificationCodeRequest struct {
+// 通过邮箱注册
+type RegisterByEmailReq struct {
+	g.Meta `path:"/register/email" method:"post" tags:"Register" summary:"User Register By Email"`
+	Email  string `json:"email" v:"email#邮箱格式不正确"`
+}
+
+type RegisterByEmailRes struct {
 	Email string `json:"email"`
-	Code  string `json:"code"` //验证码
+}
+
+// SendVerificationCodeReq 发送验证码
+type SendVerificationCodeReq struct {
+	g.Meta `path:"/email/send-code" method:"post" tags:"Email" summary:"Send Verification Code"`
+	Email  string `json:"email" v:"email#邮箱格式不正确"`
+}
+
+type SendVerificationCodeRes struct {
+	Success bool `json:"success"`
+}
+
+// LoginByVerificationCodeReq 验证码登录
+type LoginByVerificationCodeReq struct {
+	g.Meta `path:"/login/verification-code" method:"post" tags:"Login" summary:"User Login By Verification Code"`
+	Email  string `json:"email" v:"email#邮箱格式不正确"`
+	Code   string `json:"code" v:"required#验证码不能为空"`
+}
+
+type LoginByVerificationCodeRes struct {
+	Token string `json:"token" dc:"JWT token for authentication"`
+	Email string `json:"email"`
 }

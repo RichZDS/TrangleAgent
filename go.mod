@@ -5,6 +5,8 @@ go 1.24.0
 require (
 	github.com/gogf/gf/contrib/drivers/mysql/v2 v2.9.5
 	github.com/gogf/gf/v2 v2.9.5
+	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 )
 
 require (
@@ -21,7 +23,7 @@ require (
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gorilla/websocket v1.5.3 // indirect
+	github.com/gorilla/websocket v1.5.3
 	github.com/grokify/html-strip-tags-go v0.1.0 // indirect
 	github.com/magiconair/properties v1.8.10 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect

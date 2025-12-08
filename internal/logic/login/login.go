@@ -4,6 +4,7 @@ package login
 import (
 	"context"
 	"errors"
+	"fmt"
 	v1 "leke/api/login/v1"
 	"leke/internal/consts"
 	"leke/internal/dao"
@@ -17,6 +18,7 @@ import (
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/gogf/gf/v2/util/grand"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -104,7 +106,7 @@ func (s *sLogin) Login(ctx context.Context, loginReq *v1.LoginReq) (res *v1.Logi
 		glog.Errorf(ctx, "设置Session失败：%v", err)
 		return nil, gerror.Wrap(err, "设置登录状态失败，请稍后重试！")
 	}
-	
+
 	//JWT 生成
 	// Create claims with user information
 	claims := &middleware.JWTClaims{
@@ -129,6 +131,184 @@ func (s *sLogin) Login(ctx context.Context, loginReq *v1.LoginReq) (res *v1.Logi
 	return
 }
 
+// 通过邮箱注册
+func (s *sLogin) RegisterByEmail(ctx context.Context, req *v1.RegisterByEmailReq) (res *v1.RegisterByEmailRes, err error) {
+	// 检查邮箱是否已存在
+	var existingUser model.LoginField
+	err = dao.Users.Ctx(ctx).Where("email", req.Email).Scan(&existingUser)
+	if err != nil {
+		return nil, gerror.Wrap(err, "查询用户失败")
+	}
+
+	if existingUser.Email != "" {
+		return nil, gerror.New("该邮箱已被注册")
+	}
+
+	// 生成随机账号和密码
+	account := fmt.Sprintf("user_%s", grand.S(6))
+	password := grand.S(10)
+
+	// 加密密码
+	encryptedPassword, err := gmd5.Encrypt(password + consts.Salt)
+	if err != nil {
+		return nil, gerror.Wrap(err, "密码加密失败")
+	}
+
+	// 创建用户
+	userData := model.LoginField{
+		Account:  account,
+		Password: encryptedPassword,
+		Nickname: "好好先生",
+		Email:    req.Email,
+	}
+
+	_, err = dao.Users.Ctx(ctx).Data(userData).Insert()
+	if err != nil {
+		return nil, gerror.Wrap(err, "注册失败")
+	}
+
+	res = &v1.RegisterByEmailRes{
+		Email: req.Email,
+	}
+
+	// TODO: 发送邮件通知用户账号和密码
+
+	return
+}
+
+// 通过邮箱登录
+func (s *sLogin) LoginByEmail(ctx context.Context, req *v1.LoginByEmailReq) (res *v1.LoginByEmailRes, err error) {
+	// 根据邮箱查找用户
+	var user model.LoginField
+	err = dao.Users.Ctx(ctx).Where("email", req.Email).Scan(&user)
+	if err != nil {
+		return nil, gerror.Wrap(err, "查询用户失败")
+	}
+
+	if user.Email == "" {
+		return nil, gerror.New("该邮箱未注册")
+	}
+
+	// 设置session
+	if err := setSession(ctx, user.Account); err != nil {
+		glog.Errorf(ctx, "设置Session失败：%v", err)
+		return nil, gerror.Wrap(err, "设置登录状态失败，请稍后重试！")
+	}
+
+	// 生成JWT Token
+	claims := &middleware.JWTClaims{
+		Username: user.Account,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedToken, err := token.SignedString([]byte(middleware.JwtSecretKey))
+	if err != nil {
+		return nil, gerror.NewCode(gcode.CodeInternalError, "Failed to generate token")
+	}
+
+	res = &v1.LoginByEmailRes{
+		Token: signedToken,
+		Email: req.Email,
+	}
+
+	return
+}
+
+// 发送验证码
+func (s *sLogin) SendVerificationCode(ctx context.Context, req *v1.SendVerificationCodeReq) (res *v1.SendVerificationCodeRes, err error) {
+	emailService := service.NewEmailService()
+
+	err = emailService.SendVerificationCode(ctx, req.Email)
+	if err != nil {
+		return nil, gerror.Wrap(err, "发送验证码失败")
+	}
+
+	res = &v1.SendVerificationCodeRes{
+		Success: true,
+	}
+
+	return
+}
+
+// 验证码登录
+func (s *sLogin) LoginByVerificationCode(ctx context.Context, req *v1.LoginByVerificationCodeReq) (res *v1.LoginByVerificationCodeRes, err error) {
+	emailService := service.NewEmailService()
+
+	// 验证验证码
+	if !emailService.VerifyVerificationCode(req.Email, req.Code) {
+		return nil, gerror.New("验证码错误或已过期")
+	}
+
+	// 根据邮箱查找用户
+	var user model.LoginField
+	err = dao.Users.Ctx(ctx).Where("email", req.Email).Scan(&user)
+	if err != nil {
+		return nil, gerror.Wrap(err, "查询用户失败")
+	}
+
+	// 如果用户不存在，则创建新用户
+	if user.Email == "" {
+		account := fmt.Sprintf("user_%s", grand.S(6))
+		password := grand.S(10)
+
+		// 加密密码
+		encryptedPassword, err := gmd5.Encrypt(password + consts.Salt)
+		if err != nil {
+			return nil, gerror.Wrap(err, "密码加密失败")
+		}
+
+		// 创建用户
+		userData := model.LoginField{
+			Account:  account,
+			Password: encryptedPassword,
+			Nickname: "好好先生",
+			Email:    req.Email,
+		}
+
+		_, err = dao.Users.Ctx(ctx).Data(userData).Insert()
+		if err != nil {
+			return nil, gerror.Wrap(err, "创建用户失败")
+		}
+
+		user = userData
+	}
+
+	// 设置session
+	if err := setSession(ctx, user.Account); err != nil {
+		glog.Errorf(ctx, "设置Session失败：%v", err)
+		return nil, gerror.Wrap(err, "设置登录状态失败，请稍后重试！")
+	}
+
+	// 生成JWT Token
+	claims := &middleware.JWTClaims{
+		Username: user.Account,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedToken, err := token.SignedString([]byte(middleware.JwtSecretKey))
+	if err != nil {
+		return nil, gerror.NewCode(gcode.CodeInternalError, "Failed to generate token")
+	}
+
+	res = &v1.LoginByVerificationCodeRes{
+		Token: signedToken,
+		Email: req.Email,
+	}
+
+	return
+}
+
+// 退出登录
 func (s *sLogin) Logout(ctx context.Context, req *v1.LogoutReq) (res *v1.LogoutRes, err error) {
 	// 从上下文里拿到当前请求
 	r := g.RequestFromCtx(ctx)

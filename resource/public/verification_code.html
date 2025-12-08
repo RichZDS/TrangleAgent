@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>三角机构 · 机密通行码</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f5f7;
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",
+            Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+            color: #1f2933;
+        }
+        .wrapper {
+            padding: 32px 12px;
+        }
+        .window {
+            max-width: 560px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow:
+                    0 20px 40px rgba(0,0,0,.16),
+                    0 0 0 3px #111827;
+            overflow: hidden;
+            position: relative;
+        }
+        .window::before {
+            /* 顶部“打印残影”质感 */
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -18px;
+            height: 18px;
+            background: repeating-linear-gradient(
+                    90deg,
+                    rgba(15,23,42,.12) 0,
+                    rgba(15,23,42,.12) 24px,
+                    transparent 24px,
+                    transparent 48px
+            );
+            opacity: .7;
+        }
+        .window-header {
+            background: #f3f4f6;
+            border-bottom: 1px solid #d1d5db;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .title-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #4b5563;
+        }
+        .title-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            background: #b91c1c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .title-icon-inner {
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 8px solid #f9fafb;
+        }
+        .title-right {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        .window-body {
+            padding: 24px 24px 20px;
+        }
+        .logo-block {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .logo-main {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: .18em;
+            color: #111827;
+        }
+        .logo-main span {
+            color: #b91c1c;
+        }
+        .logo-sub {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .alert-banner {
+            margin: 4px 0 18px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #fee2e2;
+            border: 1px solid #b91c1c;
+            color: #7f1d1d;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .alert-badge {
+            width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            background: #b91c1c;
+            color: #f9fafb;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .headline {
+            font-size: 18px;
+            font-weight: 800;
+            color: #b91c1c;
+            text-align: center;
+            margin: 4px 0 10px;
+        }
+        .headline-sub {
+            font-size: 13px;
+            color: #4b5563;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .code-panel {
+            margin: 0 auto 20px;
+            max-width: 340px;
+            background: #111827;
+            border-radius: 16px;
+            padding: 16px 14px 18px;
+            box-shadow:
+                    0 0 0 2px #b91c1c,
+                    0 14px 26px rgba(0,0,0,.45);
+            text-align: center;
+            color: #e5e7eb;
+            position: relative;
+            overflow: hidden;
+        }
+        .code-panel::before {
+            content: "";
+            position: absolute;
+            inset: -30%;
+            background:
+                    radial-gradient(circle at 0% 0%, rgba(248,113,113,.35), transparent 60%),
+                    radial-gradient(circle at 100% 100%, rgba(239,68,68,.22), transparent 60%);
+            opacity: .9;
+            mix-blend-mode: screen;
+        }
+        .code-label {
+            position: relative;
+            font-size: 11px;
+            letter-spacing: .24em;
+            text-transform: uppercase;
+            color: #9ca3af;
+            margin-bottom: 4px;
+        }
+        .code-value {
+            position: relative;
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: .3em;
+            color: #fef2f2;
+            text-shadow:
+                    0 0 10px rgba(248,113,113,.95),
+                    0 0 24px rgba(248,113,113,.85);
+        }
+        .code-meta {
+            position: relative;
+            margin-top: 10px;
+            font-size: 11px;
+            color: #e5e7eb;
+            opacity: .9;
+        }
+        .code-meta span {
+            color: #f97373;
+        }
+        .text-block {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #4b5563;
+            margin-bottom: 14px;
+        }
+        .text-block strong {
+            color: #b91c1c;
+        }
+        .punish {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #111827;
+            background: #fef2f2;
+            border-radius: 10px;
+            border: 1px dashed #b91c1c;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+        }
+        .punish span {
+            color: #b91c1c;
+            font-weight: 700;
+        }
+        .footer {
+            margin-top: 4px;
+            font-size: 11px;
+            color: #9ca3af;
+            text-align: right;
+        }
+        .footer span {
+            color: #b91c1c;
+            font-weight: 600;
+        }
+        @media (max-width: 520px) {
+            .window {
+                margin: 0 4px;
+            }
+            .code-value {
+                font-size: 24px;
+                letter-spacing: .22em;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="window">
+        <div class="window-header">
+            <div class="title-left">
+                <div class="title-icon">
+                    <div class="title-icon-inner"></div>
+                </div>
+                <span>TRIANGLE AGENCY · INTERNAL</span>
+            </div>
+            <div class="title-right">ACCESS&nbsp;LEVEL: REDACTED</div>
+        </div>
+
+        <div class="window-body">
+            <div class="logo-block">
+                <div class="logo-main">
+                    TRI<span>▲</span>NGLE&nbsp;AG<span>▲</span>NCY
+                </div>
+                <div class="logo-sub">三角机构 · 机密通信单</div>
+            </div>
+
+            <div class="alert-banner">
+                <div class="alert-badge">!</div>
+                <div>此邮件包含<span>机密通行密码</span>，仅限机构内部人员查阅。</div>
+            </div>
+
+            <div class="headline">内部通行码 · 请勿外传</div>
+            <div class="headline-sub">
+                下方代码用于解锁指定散逸端终端。请在系统提示时准确输入。
+            </div>
+
+            <div class="code-panel">
+                <div class="code-label">CONTAINMENT ACCESS CODE</div>
+                <div class="code-value">{{.Code}}</div>
+                <div class="code-meta">
+                    有效期：<span>5 分钟</span> · 失效后请向直属经理申请新码。
+                </div>
+            </div>
+
+            <div class="text-block">
+                使用前，请再次确认：
+                <br>· 您正在使用的是<span>机构提供的终端或安全网络环境</span>；
+                <br>· 周围无未授权人员，屏幕不可被旁人窥视；
+                <br>· 本通行码只用于当前任务，不得截图、转发或长期存储。
+            </div>
+
+            <div class="punish">
+                如将本通行码<span>泄露给三角机构外部人员</span>，
+                或被系统判定存在高风险共享行为，
+                您将被立即要求前往<span>经理办公室</span>领取
+                <span>1 次申戒</span>，并记录在个人档案中。
+            </div>
+
+            <div class="text-block">
+                若您认为本邮件系误发或内容与任务不符，请立即与上级经理或风控部门联系，
+                并在完成报告前<span>不要尝试使用该通行码</span>。
+            </div>
+
+            <div class="footer">
+                发件单位：<span>三角机构 · 机密通讯科</span><br>
+                此邮件由系统自动发送，请勿直接回复。
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
