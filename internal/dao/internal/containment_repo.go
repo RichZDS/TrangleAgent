@@ -21,22 +21,22 @@ type ContainmentRepoDao struct {
 
 // ContainmentRepoColumns defines and stores column names for the table containment_repo.
 type ContainmentRepoColumns struct {
-	Id            string // auto-increment primary key
-	TerminalId    string // terminal (散逸端)
-	AbnormalCount string // number of contained anomalies (收容异常的数量)
-	AnomalyName   string // name of the anomaly (异常体的名字)
-	AgentName     string // agent (特工)
-	RepoName      string // containment repository name or code (收容库)
+	Id          string // auto-increment primary key
+	TerminalId  string // terminal (散逸端)
+	Abnormal    string // number of contained anomalies (收容异常的数量)
+	AnomalyName string // name of the anomaly (异常体的名字)
+	AgentName   string // agent (特工)
+	RepoName    string // containment repository name or code (收容库)
 }
 
 // containmentRepoColumns holds the columns for the table containment_repo.
 var containmentRepoColumns = ContainmentRepoColumns{
-	Id:            "id",
-	TerminalId:    "terminal_id",
-	AbnormalCount: "abnormal_count",
-	AnomalyName:   "anomaly_name",
-	AgentName:     "agent_name",
-	RepoName:      "repo_name",
+	Id:          "id",
+	TerminalId:  "terminal_id",
+	Abnormal:    "abnormal",
+	AnomalyName: "anomaly_name",
+	AgentName:   "agent_name",
+	RepoName:    "repo_name",
 }
 
 // NewContainmentRepoDao creates and returns a new DAO object for table data access.

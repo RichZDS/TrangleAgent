@@ -190,3 +190,39 @@ func (s *sRoom) RoomDelete(ctx context.Context, req *v1.RoomDeleteReq) (res *v1.
 	res = &v1.RoomDeleteRes{}
 	return res, nil
 }
+
+func (s *sRoom) RoomCreate(ctx context.Context, req *v1.RoomCreateReq) (res *v1.RoomCreateRes, err error) {
+	// 准备房间数据
+	room := entity.TrpgRoom{
+		RoomCode:     req.RoomCode,
+		RoomName:     req.RoomName,
+		HostId:       req.HostId,
+		MaxPlayers:   req.MaxPlayers,
+		HasPassword:  req.HasPassword,
+		IsPrivate:    req.IsPrivate,
+		SystemName:   req.SystemName,
+		ScenarioName: req.ScenarioName,
+		Description:  req.Description,
+		Status:       0, // 默认状态为未开始
+	}
+
+	// 插入数据库
+	result, err := dao.TrpgRoom.Ctx(ctx).Data(room).Insert()
+	if err != nil {
+		return nil, err
+	}
+
+	// 获取插入的ID
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	// 返回结果
+	res = &v1.RoomCreateRes{
+		Id:       uint64(id),
+		RoomCode: req.RoomCode,
+	}
+
+	return res, nil
+}

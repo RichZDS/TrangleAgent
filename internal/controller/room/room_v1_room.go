@@ -27,5 +27,5 @@ func (c *ControllerV1) RoomDelete(ctx context.Context, req *v1.RoomDeleteReq) (r
 	return service.Room().RoomDelete(ctx, req)
 }
 func (c *ControllerV1) RoomCreate(ctx context.Context, req *v1.RoomCreateReq) (res *v1.RoomCreateRes, err error) {
-	return nil, gerror.NewCode(gcode.CodeNotImplemented)
+	return service.Room().RoomCreate(ctx, req)
 }

@@ -30,6 +30,7 @@ func JWTAuth(r *ghttp.Request) {
 	tokenString := r.Header.Get("Authorization")
 	if tokenString == "" {
 		r.SetError(gerror.NewCode(gcode.CodeNotAuthorized, "No token provided"))
+		r.Exit()
 		return
 	}
 
@@ -46,6 +47,7 @@ func JWTAuth(r *ghttp.Request) {
 
 	if err != nil || !token.Valid {
 		r.SetError(gerror.NewCode(gcode.CodeNotAuthorized, "Invalid token"))
+		r.Exit()
 		return
 	}
 

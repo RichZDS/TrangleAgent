@@ -64,12 +64,6 @@ func (s *sLogin) Register(ctx context.Context, loginReq *v1.RegisterReq) (res *v
 	return
 }
 
-// JWTClaims represents the custom claims for the JWT token
-type JWTClaims struct {
-	Username string `json:"username"`
-	jwt.RegisteredClaims
-}
-
 func (s *sLogin) Login(ctx context.Context, loginReq *v1.LoginReq) (res *v1.LoginRes, err error) {
 
 	//校验参数
@@ -94,7 +88,7 @@ func (s *sLogin) Login(ctx context.Context, loginReq *v1.LoginReq) (res *v1.Logi
 		return nil, gerror.New("账号或密码错误")
 	}
 
-	// 3. 使用“相同规则”加密用户输入的密码，并和 DB 中的密码对比
+	// 3. 使用"相同规则"加密用户输入的密码，并和 DB 中的密码对比
 	// 注意：这里的加密规则必须和 Register 时一致
 	encryptedInput, err := gmd5.Encrypt(loginReq.Password + consts.Salt)
 	if err != nil {
@@ -110,9 +104,10 @@ func (s *sLogin) Login(ctx context.Context, loginReq *v1.LoginReq) (res *v1.Logi
 		glog.Errorf(ctx, "设置Session失败：%v", err)
 		return nil, gerror.Wrap(err, "设置登录状态失败，请稍后重试！")
 	}
+	
 	//JWT 生成
 	// Create claims with user information
-	claims := &JWTClaims{
+	claims := &middleware.JWTClaims{
 		Username: loginReq.Account,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),

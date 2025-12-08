@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"leke/internal/model"
 	"leke/internal/model/response"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -30,7 +31,7 @@ type ContainmentRepoListReq struct {
 
 type ContainmentRepoListRes struct {
 	response.PageResult
-	List []*ContainmentRepoInfo `json:"list"`
+	List []*model.ContainmentRepo `json:"list"`
 }
 
 // View

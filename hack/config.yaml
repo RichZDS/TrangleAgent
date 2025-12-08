@@ -4,7 +4,7 @@ gfcli:
   gen:
     dao:
       - link: "mysql:root:123456@tcp(127.0.0.1:3306)/fitness_app"
-        table: "containment_repo"
+        table: "containment_repo,fans,subscribe"
         descriptionTag: true
         jsonCase: "CamelLower" # 生成json字段时，字段名使用驼峰命名
   docker:
