@@ -21,62 +21,50 @@ type UsersDao struct {
 
 // UsersColumns defines and stores column names for the table users.
 type UsersColumns struct {
-	Id             string // 用户ID
-	Account        string // 账号
-	Password       string // 密码哈希
-	Nickname       string // 昵称
-	Gender         string // 性别：0未知 1男 2女
-	BirthDate      string // 生日
-	UserType       string // 用户类型：normal普通用户，vip为VIP用户
-	VipStartAt     string // VIP开始时间
-	VipEndAt       string // VIP结束时间
-	CreatedAt      string // 创建时间
-	UpdatedAt      string // 更新时间
-	QaFocus        string // 专注
-	QaEmpathy      string // 共情
-	QaPresence     string // 气场
-	QaDeception    string // 欺瞒
-	QaInitiative   string // 主动
-	QaProfessional string // 专业
-	QaVigor        string // 活力
-	QaTenacity     string // 坚毅
-	QaStealth      string // 诡秘
-	RealityRole    string // 现实身份/角色
-	AbnormalRole   string // 异常身份/角色
-	JobTitle       string // 职位
-	Commendation   string //
-	Admonition     string //
-	Email          string //
+	Id           string // 用户ID
+	Account      string // 账号
+	Password     string // 密码哈希
+	Nickname     string // 昵称
+	Gender       string // 性别：0未知 1男 2女
+	BirthDate    string // 生日
+	UserType     string // 用户类型：normal普通用户，vip为VIP用户
+	VipStartAt   string // VIP开始时间
+	VipEndAt     string // VIP结束时间
+	CreatedAt    string // 创建时间
+	UpdatedAt    string // 更新时间
+	RealityRole  string // 现实身份/角色
+	AbnormalRole string // 异常身份/角色
+	JobTitle     string // 职位
+	Commendation string //
+	Admonition   string //
+	Email        string //
+	RedTrace     string // 红轨
+	YellowTrace  string // 黄轨
+	BlueTrace    string // 蓝轨
 }
 
 // usersColumns holds the columns for the table users.
 var usersColumns = UsersColumns{
-	Id:             "id",
-	Account:        "account",
-	Password:       "password",
-	Nickname:       "nickname",
-	Gender:         "gender",
-	BirthDate:      "birth_date",
-	UserType:       "user_type",
-	VipStartAt:     "vip_start_at",
-	VipEndAt:       "vip_end_at",
-	CreatedAt:      "created_at",
-	UpdatedAt:      "updated_at",
-	QaFocus:        "qa_focus",
-	QaEmpathy:      "qa_empathy",
-	QaPresence:     "qa_presence",
-	QaDeception:    "qa_deception",
-	QaInitiative:   "qa_initiative",
-	QaProfessional: "qa_professional",
-	QaVigor:        "qa_vigor",
-	QaTenacity:     "qa_tenacity",
-	QaStealth:      "qa_stealth",
-	RealityRole:    "reality_role",
-	AbnormalRole:   "abnormal_role",
-	JobTitle:       "job_title",
-	Commendation:   "Commendation",
-	Admonition:     "Admonition",
-	Email:          "email",
+	Id:           "id",
+	Account:      "account",
+	Password:     "password",
+	Nickname:     "nickname",
+	Gender:       "gender",
+	BirthDate:    "birth_date",
+	UserType:     "user_type",
+	VipStartAt:   "vip_start_at",
+	VipEndAt:     "vip_end_at",
+	CreatedAt:    "created_at",
+	UpdatedAt:    "updated_at",
+	RealityRole:  "reality_role",
+	AbnormalRole: "abnormal_role",
+	JobTitle:     "job_title",
+	Commendation: "Commendation",
+	Admonition:   "Admonition",
+	Email:        "email",
+	RedTrace:     "red_trace",
+	YellowTrace:  "yellow_trace",
+	BlueTrace:    "blue_trace",
 }
 
 // NewUsersDao creates and returns a new DAO object for table data access.

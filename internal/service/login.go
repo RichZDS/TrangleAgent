@@ -18,7 +18,6 @@ type (
 		RegisterByEmail(ctx context.Context, req *v1.RegisterByEmailReq) (res *v1.RegisterByEmailRes, err error)
 		LoginByEmail(ctx context.Context, req *v1.LoginByEmailReq) (res *v1.LoginByEmailRes, err error)
 		SendVerificationCode(ctx context.Context, req *v1.SendVerificationCodeReq) (res *v1.SendVerificationCodeRes, err error)
-		LoginByVerificationCode(ctx context.Context, req *v1.LoginByVerificationCodeReq) (res *v1.LoginByVerificationCodeRes, err error)
 	}
 )
 

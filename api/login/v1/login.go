@@ -32,10 +32,11 @@ type LogoutReq struct {
 type LogoutRes struct {
 }
 
-// 用邮箱登录
+// 用邮箱登录（包含验证码）
 type LoginByEmailReq struct {
 	g.Meta `path:"/login/email" method:"post" tags:"Login" summary:"User Login By Email"`
 	Email  string `json:"email" v:"email#邮箱格式不正确"`
+	Code   string `json:"code" v:"required#验证码不能为空"`
 }
 
 type LoginByEmailRes struct {
@@ -47,6 +48,7 @@ type LoginByEmailRes struct {
 type RegisterByEmailReq struct {
 	g.Meta `path:"/register/email" method:"post" tags:"Register" summary:"User Register By Email"`
 	Email  string `json:"email" v:"email#邮箱格式不正确"`
+	Code   string `json:"code" v:"required#验证码不能为空"`
 }
 
 type RegisterByEmailRes struct {
@@ -61,16 +63,4 @@ type SendVerificationCodeReq struct {
 
 type SendVerificationCodeRes struct {
 	Success bool `json:"success"`
-}
-
-// LoginByVerificationCodeReq 验证码登录
-type LoginByVerificationCodeReq struct {
-	g.Meta `path:"/login/verification-code" method:"post" tags:"Login" summary:"User Login By Verification Code"`
-	Email  string `json:"email" v:"email#邮箱格式不正确"`
-	Code   string `json:"code" v:"required#验证码不能为空"`
-}
-
-type LoginByVerificationCodeRes struct {
-	Token string `json:"token" dc:"JWT token for authentication"`
-	Email string `json:"email"`
 }

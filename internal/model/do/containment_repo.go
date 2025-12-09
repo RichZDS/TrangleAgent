@@ -12,9 +12,8 @@ import (
 type ContainmentRepo struct {
 	g.Meta      `orm:"table:containment_repo, do:true"`
 	Id          any // auto-increment primary key
-	TerminalId  any // terminal (散逸端)
-	Abnormal    any // number of contained anomalies (收容异常的数量)
 	AnomalyName any // name of the anomaly (异常体的名字)
 	AgentName   any // agent (特工)
 	RepoName    any // containment repository name or code (收容库)
+	Department  any // 部门
 }

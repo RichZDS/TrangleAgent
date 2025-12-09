@@ -3,6 +3,7 @@ package login
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	v1 "leke/api/login/v1"
@@ -55,7 +56,7 @@ func (s *sLogin) Register(ctx context.Context, loginReq *v1.RegisterReq) (res *v
 	loginData := model.LoginField{
 		Account:  loginReq.Account,
 		Password: password,
-		Nickname: "好好先生",
+		Nickname: "特工007",
 	}
 
 	_, err = dao.Users.Ctx(ctx).Data(loginData).Insert()
@@ -133,14 +134,18 @@ func (s *sLogin) Login(ctx context.Context, loginReq *v1.LoginReq) (res *v1.Logi
 
 // 通过邮箱注册
 func (s *sLogin) RegisterByEmail(ctx context.Context, req *v1.RegisterByEmailReq) (res *v1.RegisterByEmailRes, err error) {
+	// 先验证验证码
+	emailService := service.NewEmailService()
+	if !emailService.VerifyVerificationCode(req.Email, req.Code) {
+		return nil, gerror.New("验证码错误或已过期")
+	}
+
 	// 检查邮箱是否已存在
-	var existingUser model.LoginField
-	err = dao.Users.Ctx(ctx).Where("email", req.Email).Scan(&existingUser)
+	count, err := dao.Users.Ctx(ctx).Where("email", req.Email).Count()
 	if err != nil {
 		return nil, gerror.Wrap(err, "查询用户失败")
 	}
-
-	if existingUser.Email != "" {
+	if count > 0 {
 		return nil, gerror.New("该邮箱已被注册")
 	}
 
@@ -158,7 +163,7 @@ func (s *sLogin) RegisterByEmail(ctx context.Context, req *v1.RegisterByEmailReq
 	userData := model.LoginField{
 		Account:  account,
 		Password: encryptedPassword,
-		Nickname: "好好先生",
+		Nickname: "特工007",
 		Email:    req.Email,
 	}
 
@@ -170,23 +175,50 @@ func (s *sLogin) RegisterByEmail(ctx context.Context, req *v1.RegisterByEmailReq
 	res = &v1.RegisterByEmailRes{
 		Email: req.Email,
 	}
-
-	// TODO: 发送邮件通知用户账号和密码
-
 	return
 }
 
 // 通过邮箱登录
 func (s *sLogin) LoginByEmail(ctx context.Context, req *v1.LoginByEmailReq) (res *v1.LoginByEmailRes, err error) {
+	emailService := service.NewEmailService()
+
+	// 验证验证码
+	if !emailService.VerifyVerificationCode(req.Email, req.Code) {
+		return nil, gerror.New("验证码错误或已过期")
+	}
+
 	// 根据邮箱查找用户
 	var user model.LoginField
 	err = dao.Users.Ctx(ctx).Where("email", req.Email).Scan(&user)
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		return nil, gerror.Wrap(err, "查询用户失败")
 	}
 
+	// 如果用户不存在，则创建新用户
 	if user.Email == "" {
-		return nil, gerror.New("该邮箱未注册")
+		account := fmt.Sprintf("user_%s", grand.S(6))
+		password := grand.S(10)
+
+		// 加密密码
+		encryptedPassword, err := gmd5.Encrypt(password + consts.Salt)
+		if err != nil {
+			return nil, gerror.Wrap(err, "密码加密失败")
+		}
+
+		// 创建用户
+		userData := model.LoginField{
+			Account:  account,
+			Password: encryptedPassword,
+			Nickname: "特工007",
+			Email:    req.Email,
+		}
+
+		_, err = dao.Users.Ctx(ctx).Data(userData).Insert()
+		if err != nil {
+			return nil, gerror.Wrap(err, "创建用户失败")
+		}
+
+		user = userData
 	}
 
 	// 设置session
@@ -235,78 +267,6 @@ func (s *sLogin) SendVerificationCode(ctx context.Context, req *v1.SendVerificat
 	return
 }
 
-// 验证码登录
-func (s *sLogin) LoginByVerificationCode(ctx context.Context, req *v1.LoginByVerificationCodeReq) (res *v1.LoginByVerificationCodeRes, err error) {
-	emailService := service.NewEmailService()
-
-	// 验证验证码
-	if !emailService.VerifyVerificationCode(req.Email, req.Code) {
-		return nil, gerror.New("验证码错误或已过期")
-	}
-
-	// 根据邮箱查找用户
-	var user model.LoginField
-	err = dao.Users.Ctx(ctx).Where("email", req.Email).Scan(&user)
-	if err != nil {
-		return nil, gerror.Wrap(err, "查询用户失败")
-	}
-
-	// 如果用户不存在，则创建新用户
-	if user.Email == "" {
-		account := fmt.Sprintf("user_%s", grand.S(6))
-		password := grand.S(10)
-
-		// 加密密码
-		encryptedPassword, err := gmd5.Encrypt(password + consts.Salt)
-		if err != nil {
-			return nil, gerror.Wrap(err, "密码加密失败")
-		}
-
-		// 创建用户
-		userData := model.LoginField{
-			Account:  account,
-			Password: encryptedPassword,
-			Nickname: "好好先生",
-			Email:    req.Email,
-		}
-
-		_, err = dao.Users.Ctx(ctx).Data(userData).Insert()
-		if err != nil {
-			return nil, gerror.Wrap(err, "创建用户失败")
-		}
-
-		user = userData
-	}
-
-	// 设置session
-	if err := setSession(ctx, user.Account); err != nil {
-		glog.Errorf(ctx, "设置Session失败：%v", err)
-		return nil, gerror.Wrap(err, "设置登录状态失败，请稍后重试！")
-	}
-
-	// 生成JWT Token
-	claims := &middleware.JWTClaims{
-		Username: user.Account,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			NotBefore: jwt.NewNumericDate(time.Now()),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString([]byte(middleware.JwtSecretKey))
-	if err != nil {
-		return nil, gerror.NewCode(gcode.CodeInternalError, "Failed to generate token")
-	}
-
-	res = &v1.LoginByVerificationCodeRes{
-		Token: signedToken,
-		Email: req.Email,
-	}
-
-	return
-}
 
 // 退出登录
 func (s *sLogin) Logout(ctx context.Context, req *v1.LogoutReq) (res *v1.LogoutRes, err error) {

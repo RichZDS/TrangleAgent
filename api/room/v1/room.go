@@ -61,9 +61,9 @@ type RoomCreateRes struct {
 
 // RoomUpdateReq 更新房间请求
 type RoomUpdateReq struct {
-	g.Meta           `path:"/room/update" method:"put" tags:"Room" summary:"Room Update"`
-	RoomCode         string `json:"room_code"   orm:"room_code"   description:"房间号(作为更新定位字段)"`
-	model.RoomParams        // 直接复用你的实体，里面包含要修改的字段
+	g.Meta   `path:"/room/update" method:"put" tags:"Room" summary:"Room Update"`
+	RoomCode string `json:"room_code"   orm:"room_code"   description:"房间号(作为更新定位字段)"`
+	model.RoomParams
 }
 
 // RoomUpdateRes 更新房间响应

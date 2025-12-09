@@ -58,8 +58,3 @@ func (c *ControllerV1) LoginByEmail(ctx context.Context, req *v1.LoginByEmailReq
 func (c *ControllerV1) SendVerificationCode(ctx context.Context, req *v1.SendVerificationCodeReq) (res *v1.SendVerificationCodeRes, err error) {
 	return service.Login().SendVerificationCode(ctx, req)
 }
-
-// 验证码登录
-func (c *ControllerV1) LoginByVerificationCode(ctx context.Context, req *v1.LoginByVerificationCodeReq) (res *v1.LoginByVerificationCodeRes, err error) {
-	return service.Login().LoginByVerificationCode(ctx, req)
-}
