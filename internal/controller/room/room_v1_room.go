@@ -29,3 +29,7 @@ func (c *ControllerV1) RoomDelete(ctx context.Context, req *v1.RoomDeleteReq) (r
 func (c *ControllerV1) RoomCreate(ctx context.Context, req *v1.RoomCreateReq) (res *v1.RoomCreateRes, err error) {
 	return service.Room().RoomCreate(ctx, req)
 }
+
+func (c *ControllerV1) RoomJoin(ctx context.Context, req *v1.RoomJoinReq) (res *v1.RoomJoinRes, err error) {
+	return service.Room().RoomJoin(ctx, req)
+}

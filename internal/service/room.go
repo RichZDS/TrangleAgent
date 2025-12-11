@@ -17,6 +17,7 @@ type (
 		RoomUpdate(ctx context.Context, req *v1.RoomUpdateReq) (res *v1.RoomUpdateRes, err error)
 		RoomDelete(ctx context.Context, req *v1.RoomDeleteReq) (res *v1.RoomDeleteRes, err error)
 		RoomCreate(ctx context.Context, req *v1.RoomCreateReq) (res *v1.RoomCreateRes, err error)
+		RoomJoin(ctx context.Context, req *v1.RoomJoinReq) (res *v1.RoomJoinRes, err error)
 	}
 )
 

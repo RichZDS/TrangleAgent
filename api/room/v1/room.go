@@ -79,3 +79,13 @@ type RoomDeleteReq struct {
 
 // RoomDeleteRes 删除房间响应
 type RoomDeleteRes struct{}
+
+type RoomJoinReq struct {
+	g.Meta `path:"/room/join" method:"post" tags:"Room" summary:"Room Join"`
+	RoomId uint64 `json:"roomId" description:"房间ID"`
+}
+
+type RoomJoinRes struct {
+	Id       uint64 `json:"id"         description:"房间ID"`
+	RoomCode string `json:"roomCode"   description:"房间号"`
+}

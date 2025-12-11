@@ -7,7 +7,7 @@ package room
 import (
 	"context"
 
-	"leke/api/room/v1"
+	v1 "leke/api/room/v1"
 )
 
 type IRoomV1 interface {
@@ -16,4 +16,5 @@ type IRoomV1 interface {
 	RoomCreate(ctx context.Context, req *v1.RoomCreateReq) (res *v1.RoomCreateRes, err error)
 	RoomUpdate(ctx context.Context, req *v1.RoomUpdateReq) (res *v1.RoomUpdateRes, err error)
 	RoomDelete(ctx context.Context, req *v1.RoomDeleteReq) (res *v1.RoomDeleteRes, err error)
+	RoomJoin(ctx context.Context, req *v1.RoomJoinReq) (res *v1.RoomJoinRes, err error)
 }
