@@ -2,7 +2,8 @@ package fans
 
 import (
 	"context"
-	"github.com/gogf/gf/v
+
+	"github.com/gogf/gf/v2/os/gtime"
 	v1 "leke/api/user/v1"
 	"leke/internal/dao"
 	"leke/internal/service"
@@ -19,6 +20,14 @@ func init() {
 }
 
 // FansList 获取粉丝列表
+//
+// 参数:
+//   - ctx context.Context: 上下文信息
+//   - req *v1.FansListReq: 粉丝列表请求参数
+//
+// 返回:
+//   - res *v1.FansListRes: 粉丝列表响应结果
+//   - err error: 错误信息
 func (s *sFans) FansList(ctx context.Context, req *v1.FansListReq) (res *v1.FansListRes, err error) {
 	// 创建数据库查询模型
 	m := dao.Fans.Ctx(ctx)
@@ -60,6 +69,14 @@ func (s *sFans) FansList(ctx context.Context, req *v1.FansListReq) (res *v1.Fans
 }
 
 // FansView 获取粉丝详情
+//
+// 参数:
+//   - ctx context.Context: 上下文信息
+//   - req *v1.FansViewReq: 粉丝详情请求参数
+//
+// 返回:
+//   - res *v1.FansViewRes: 粉丝详情响应结果
+//   - err error: 错误信息
 func (s *sFans) FansView(ctx context.Context, req *v1.FansViewReq) (res *v1.FansViewRes, err error) {
 	// 创建数据库查询模型
 	m := dao.Fans.Ctx(ctx)
@@ -77,6 +94,14 @@ func (s *sFans) FansView(ctx context.Context, req *v1.FansViewReq) (res *v1.Fans
 }
 
 // FansUpdate 更新粉丝信息
+//
+// 参数:
+//   - ctx context.Context: 上下文信息
+//   - req *v1.FansUpdateReq: 粉丝更新请求参数
+//
+// 返回:
+//   - res *v1.FansUpdateRes: 粉丝更新响应结果
+//   - err error: 错误信息
 func (s *sFans) FansUpdate(ctx context.Context, req *v1.FansUpdateReq) (res *v1.FansUpdateRes, err error) {
 	// 创建数据库查询模型
 	m := dao.Fans.Ctx(ctx)
@@ -95,6 +120,14 @@ func (s *sFans) FansUpdate(ctx context.Context, req *v1.FansUpdateReq) (res *v1.
 }
 
 // FansDelete 删除粉丝关系
+//
+// 参数:
+//   - ctx context.Context: 上下文信息
+//   - req *v1.FansDeleteReq: 粉丝删除请求参数
+//
+// 返回:
+//   - res *v1.FansDeleteRes: 粉丝删除响应结果
+//   - err error: 错误信息
 func (s *sFans) FansDelete(ctx context.Context, req *v1.FansDeleteReq) (res *v1.FansDeleteRes, err error) {
 	// 根据ID删除粉丝关系
 	_, err = dao.Fans.Ctx(ctx).Where(dao.Fans.Columns().Id, req.Id).Delete()
@@ -107,6 +140,14 @@ func (s *sFans) FansDelete(ctx context.Context, req *v1.FansDeleteReq) (res *v1.
 }
 
 // FansCreate 创建粉丝关系
+//
+// 参数:
+//   - ctx context.Context: 上下文信息
+//   - req *v1.FansCreateReq: 粉丝创建请求参数
+//
+// 返回:
+//   - res *v1.FansCreateRes: 粉丝创建响应结果
+//   - err error: 错误信息
 func (s *sFans) FansCreate(ctx context.Context, req *v1.FansCreateReq) (res *v1.FansCreateRes, err error) {
 	// 创建数据库查询模型
 	m := dao.Fans.Ctx(ctx)

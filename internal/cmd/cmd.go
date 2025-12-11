@@ -17,6 +17,24 @@ var (
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 			s := g.Server()
 
+			// ... existing code ...
+			// CORS 中间件
+			s.Use(func(r *ghttp.Request) {
+				r.Response.CORS(ghttp.CORSOptions{
+					AllowOrigin:      "http://localhost:3000,http://localhost:8080",
+					AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
+					AllowHeaders:     "Content-Type,Authorization,X-Requested-With",
+					AllowCredentials: "true",
+					MaxAge:           3600,
+				})
+				if r.Method == "OPTIONS" {
+					r.Response.WriteStatusExit(200)
+					return
+				}
+				r.Middleware.Next()
+			})
+			// ... existing code ...
+
 			// 注册 API 路由组
 			s.Group("/api", func(group *ghttp.RouterGroup) {
 				group.Middleware(ghttp.MiddlewareHandlerResponse)

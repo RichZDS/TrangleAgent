@@ -25,6 +25,7 @@ func RegisterControllers(group *ghttp.RouterGroup) {
 		g.Middleware(middleware.JWTAuth)
 		g.Bind(
 			user.NewV1(),
+			user.NewRoleV1(),
 			department.NewV1(),
 			containment.NewV1(),
 			room.NewV1(),

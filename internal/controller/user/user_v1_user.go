@@ -3,9 +3,6 @@ package user
 import (
 	"context"
 
-	"github.com/gogf/gf/v2/errors/gcode"
-	"github.com/gogf/gf/v2/errors/gerror"
-
 	v1 "leke/api/user/v1"
 	"leke/internal/service"
 )
@@ -73,17 +70,17 @@ func (c *ControllerV1) SubscribeCreate(ctx context.Context, req *v1.SubscribeCre
 
 // Trace 相关方法
 func (c *ControllerV1) TraceList(ctx context.Context, req *v1.TraceListReq) (res *v1.TraceListRes, err error) {
-	return nil, gerror.NewCode(gcode.CodeNotImplemented)
+	return service.Trace().TraceList(ctx, req)
 }
 
 func (c *ControllerV1) TraceView(ctx context.Context, req *v1.TraceViewReq) (res *v1.TraceViewRes, err error) {
-	return nil, gerror.NewCode(gcode.CodeNotImplemented)
+	return service.Trace().TraceView(ctx, req)
 }
 
 func (c *ControllerV1) TraceUpdate(ctx context.Context, req *v1.TraceUpdateReq) (res *v1.TraceUpdateRes, err error) {
-	return nil, gerror.NewCode(gcode.CodeNotImplemented)
+	return service.Trace().TraceUpdate(ctx, req)
 }
 
 func (c *ControllerV1) TraceReduce(ctx context.Context, req *v1.TraceReduceReq) (res *v1.TraceReduceRes, err error) {
-	return nil, gerror.NewCode(gcode.CodeNotImplemented)
+	return service.Trace().TraceReduce(ctx, req)
 }

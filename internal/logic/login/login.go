@@ -88,7 +88,7 @@ func (s *sLogin) Login(ctx context.Context, loginReq *v1.LoginReq) (res *v1.Logi
 	}
 	if user.Account == "" {
 		// 没查到用户
-		return nil, gerror.New("账号或密码错误")
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "账号或密码错误")
 	}
 
 	// 3. 使用"相同规则"加密用户输入的密码，并和 DB 中的密码对比
@@ -99,7 +99,7 @@ func (s *sLogin) Login(ctx context.Context, loginReq *v1.LoginReq) (res *v1.Logi
 		return nil, gerror.Wrap(err, "密码加密失败，请稍后重试！")
 	}
 	if user.Password != encryptedInput {
-		return nil, gerror.New("账号或密码错误")
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "账号或密码错误")
 	}
 
 	// 5. 种 Session（如果你确实需要 session）
@@ -137,7 +137,7 @@ func (s *sLogin) RegisterByEmail(ctx context.Context, req *v1.RegisterByEmailReq
 	// 先验证验证码
 	emailService := service.NewEmailService()
 	if !emailService.VerifyVerificationCode(req.Email, req.Code) {
-		return nil, gerror.New("验证码错误或已过期")
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "验证码错误或已过期")
 	}
 
 	// 检查邮箱是否已存在
@@ -146,7 +146,7 @@ func (s *sLogin) RegisterByEmail(ctx context.Context, req *v1.RegisterByEmailReq
 		return nil, gerror.Wrap(err, "查询用户失败")
 	}
 	if count > 0 {
-		return nil, gerror.New("该邮箱已被注册")
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "该邮箱已被注册")
 	}
 
 	// 生成随机账号和密码
@@ -184,14 +184,14 @@ func (s *sLogin) LoginByEmail(ctx context.Context, req *v1.LoginByEmailReq) (res
 
 	// 验证验证码
 	if !emailService.VerifyVerificationCode(req.Email, req.Code) {
-		return nil, gerror.New("验证码错误或已过期")
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "验证码错误或已过期")
 	}
 
 	// 根据邮箱查找用户
 	var user model.LoginField
 	err = dao.Users.Ctx(ctx).Where("email", req.Email).Scan(&user)
 	if err != nil && err != sql.ErrNoRows {
-		return nil, gerror.Wrap(err, "查询用户失败")
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "查询用户失败")
 	}
 
 	// 如果用户不存在，则创建新用户
@@ -266,7 +266,6 @@ func (s *sLogin) SendVerificationCode(ctx context.Context, req *v1.SendVerificat
 
 	return
 }
-
 
 // 退出登录
 func (s *sLogin) Logout(ctx context.Context, req *v1.LogoutReq) (res *v1.LogoutRes, err error) {
