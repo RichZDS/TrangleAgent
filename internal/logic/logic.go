@@ -5,6 +5,7 @@
 package logic
 
 import (
+	_ "leke/internal/logic/ForumComments"
 	_ "leke/internal/logic/containment"
 	_ "leke/internal/logic/department"
 	_ "leke/internal/logic/fans"

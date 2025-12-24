@@ -21,6 +21,7 @@ type IUserV1 interface {
 	RoleView(ctx context.Context, req *v1.RoleViewReq) (res *v1.RoleViewRes, err error)
 	RoleList(ctx context.Context, req *v1.RoleListReq) (res *v1.RoleListRes, err error)
 	RoleDelete(ctx context.Context, req *v1.RoleDeleteReq) (res *v1.RoleDeleteRes, err error)
+	RolePermissionCheck(ctx context.Context, req *v1.RolePermissionCheckReq) (res *v1.RolePermissionCheckRes, err error)
 	SubscribeList(ctx context.Context, req *v1.SubscribeListReq) (res *v1.SubscribeListRes, err error)
 	SubscribeView(ctx context.Context, req *v1.SubscribeViewReq) (res *v1.SubscribeViewRes, err error)
 	SubscribeUpdate(ctx context.Context, req *v1.SubscribeUpdateReq) (res *v1.SubscribeUpdateRes, err error)
