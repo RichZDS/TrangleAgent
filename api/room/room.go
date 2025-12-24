@@ -7,7 +7,7 @@ package room
 import (
 	"context"
 
-	v1 "leke/api/room/v1"
+	"leke/api/room/v1"
 )
 
 type IRoomV1 interface {

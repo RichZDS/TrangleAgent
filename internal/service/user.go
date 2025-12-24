@@ -16,13 +16,17 @@ type (
 		UserView(ctx context.Context, req *v1.UserViewReq) (res *v1.UserViewRes, err error)
 		UserUpdate(ctx context.Context, req *v1.UserUpdateReq) (res *v1.UserUpdateRes, err error)
 		UserDelete(ctx context.Context, req *v1.UserDeleteReq) (res *v1.UserDeleteRes, err error)
-
-		// Role management methods
+		// RoleCreate 创建角色
 		RoleCreate(ctx context.Context, req *v1.RoleCreateReq) (res *v1.RoleCreateRes, err error)
+		// RoleUpdate 更新角色
 		RoleUpdate(ctx context.Context, req *v1.RoleUpdateReq) (res *v1.RoleUpdateRes, err error)
+		// RoleView 查看角色详情
 		RoleView(ctx context.Context, req *v1.RoleViewReq) (res *v1.RoleViewRes, err error)
+		// RoleList 获取角色列表
 		RoleList(ctx context.Context, req *v1.RoleListReq) (res *v1.RoleListRes, err error)
+		// RoleDelete 删除角色
 		RoleDelete(ctx context.Context, req *v1.RoleDeleteReq) (res *v1.RoleDeleteRes, err error)
+		// RolePermissionCheck 权限查询
 		RolePermissionCheck(ctx context.Context, req *v1.RolePermissionCheckReq) (res *v1.RolePermissionCheckRes, err error)
 	}
 )
