@@ -10,7 +10,7 @@ import (
 // RoomListReq 房间列表请求
 type RoomListReq struct {
 	response.PageResult
-	g.Meta     `path:"/room/list" method:"get" tags:"Room" summary:"Room List"`
+	g.Meta     `path:"/room/list" method:"get" tags:"房间" summary:"房间列表"`
 	RoomCode   string `json:"room_code"   orm:"room_code"    description:"房间号"`
 	RoomName   string `json:"room_name"   orm:"room_name"    description:"房间名称"`
 	HostId     uint64 `json:"host_id"     orm:"host_id"      description:"主持人用户ID"`
@@ -26,7 +26,7 @@ type RoomListRes struct {
 
 // RoomViewReq 房间详情请求
 type RoomViewReq struct {
-	g.Meta   `path:"/room/view" method:"get" tags:"Room" summary:"Room View"`
+	g.Meta   `path:"/room/view" method:"get" tags:"房间" summary:"房间详情"`
 	Id       uint64 `json:"id"         orm:"id"          description:"房间ID"`
 	RoomCode string `json:"room_code"  orm:"room_code"   description:"房间号"`
 }
@@ -38,7 +38,7 @@ type RoomViewRes struct {
 
 // RoomCreateReq 创建房间请求
 type RoomCreateReq struct {
-	g.Meta `path:"/room/create" method:"post" tags:"Room" summary:"Room Create"`
+	g.Meta `path:"/room/create" method:"post" tags:"房间" summary:"创建房间"`
 
 	// 这里根据你实际的 room 表字段自己增删
 	RoomCode     string `json:"room_code"    orm:"room_code"     description:"房间号"`
@@ -61,7 +61,7 @@ type RoomCreateRes struct {
 
 // RoomUpdateReq 更新房间请求
 type RoomUpdateReq struct {
-	g.Meta   `path:"/room/update" method:"put" tags:"Room" summary:"Room Update"`
+	g.Meta   `path:"/room/update" method:"put" tags:"房间" summary:"更新房间"`
 	RoomCode string `json:"room_code"   orm:"room_code"   description:"房间号(作为更新定位字段)"`
 	model.RoomParams
 }
@@ -73,7 +73,7 @@ type RoomUpdateRes struct {
 
 // RoomDeleteReq 删除房间请求
 type RoomDeleteReq struct {
-	g.Meta   `path:"/room/delete" method:"delete" tags:"Room" summary:"Room Delete"`
+	g.Meta   `path:"/room/delete" method:"delete" tags:"房间" summary:"删除房间"`
 	RoomCode string `json:"room_code"   orm:"room_code"      description:"房间号"`
 }
 
@@ -81,7 +81,7 @@ type RoomDeleteReq struct {
 type RoomDeleteRes struct{}
 
 type RoomJoinReq struct {
-	g.Meta `path:"/room/join" method:"post" tags:"Room" summary:"Room Join"`
+	g.Meta `path:"/room/join" method:"post" tags:"房间" summary:"加入房间"`
 	RoomId uint64 `json:"roomId" description:"房间ID"`
 }
 

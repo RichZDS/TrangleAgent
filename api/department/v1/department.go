@@ -23,7 +23,7 @@ type Department struct {
 // DepartmentListReq 部门列表请求参数
 type DepartmentListReq struct {
 	response.PageResult
-	g.Meta      `path:"/department/list" method:"get" tags:"Department" summary:"Department List"`
+	g.Meta      `path:"/department/list" method:"get" tags:"部门" summary:"部门列表"`
 	BranchName  string `json:"branchName"   description:"分部名称"`
 	ManagerName string `json:"managerName"  description:"分部经理名称"`
 	UserId      uint64 `json:"userId"       description:"所属用户ID"`
@@ -37,7 +37,7 @@ type DepartmentListRes struct {
 
 // DepartmentViewReq 部门详情请求参数
 type DepartmentViewReq struct {
-	g.Meta `path:"/department/view" method:"get" tags:"Department" summary:"Department View"`
+	g.Meta `path:"/department/view" method:"get" tags:"部门" summary:"部门详情"`
 	Id     uint64 `json:"id" v:"required#部门ID不能为空"`
 }
 
@@ -48,7 +48,7 @@ type DepartmentViewRes struct {
 
 // DepartmentCreateReq 部门创建请求参数
 type DepartmentCreateReq struct {
-	g.Meta        `path:"/department/create" method:"post" tags:"Department" summary:"Department Create"`
+	g.Meta        `path:"/department/create" method:"post" tags:"部门" summary:"创建部门"`
 	UserId        uint64 `json:"userId"        v:"required#所属用户ID不能为空"`
 	BranchName    string `json:"branchName"    v:"required#分部名称不能为空"`
 	TerminalCount int    `json:"terminalCount" description:"分部散逸端的数量"`
@@ -64,7 +64,7 @@ type DepartmentCreateRes struct {
 
 // DepartmentUpdateReq 部门更新请求参数
 type DepartmentUpdateReq struct {
-	g.Meta        `path:"/department/update" method:"put" tags:"Department" summary:"Department Update"`
+	g.Meta        `path:"/department/update" method:"put" tags:"部门" summary:"更新部门"`
 	Id            uint64 `json:"id"            v:"required#部门ID不能为空"`
 	UserId        uint64 `json:"userId"        v:"required#所属用户ID不能为空"`
 	BranchName    string `json:"branchName"    v:"required#分部名称不能为空"`
@@ -81,7 +81,7 @@ type DepartmentUpdateRes struct {
 
 // DepartmentDeleteReq 部门删除请求参数
 type DepartmentDeleteReq struct {
-	g.Meta `path:"/department/delete" method:"delete" tags:"Department" summary:"Department Delete"`
+	g.Meta `path:"/department/delete" method:"delete" tags:"部门" summary:"删除部门"`
 	Id     uint64 `json:"id" v:"required#部门ID不能为空"`
 }
 

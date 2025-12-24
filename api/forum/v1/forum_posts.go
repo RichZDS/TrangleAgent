@@ -8,7 +8,7 @@ import (
 
 // ForumPostsCreateReq 创建帖子请求
 type ForumPostsCreateReq struct {
-	g.Meta     `path:"/forum/posts/create" method:"post" tags:"ForumPosts" summary:"创建帖子"`
+	g.Meta     `path:"/forum/posts/create" method:"post" tags:"论坛帖子" summary:"创建帖子"`
 	UserId     uint64 `json:"userId"      description:"发帖用户ID"`
 	Title      string `json:"title"       description:"帖子标题"`
 	Content    string `json:"content"     description:"帖子正文"`
@@ -23,7 +23,7 @@ type ForumPostsCreateRes struct {
 
 // ForumPostsUpdateReq 更新帖子请求
 type ForumPostsUpdateReq struct {
-	g.Meta     `path:"/forum/posts/update" method:"put" tags:"ForumPosts" summary:"更新帖子"`
+	g.Meta     `path:"/forum/posts/update" method:"put" tags:"论坛帖子" summary:"更新帖子"`
 	Id         uint64 `json:"id"          description:"帖子ID"`
 	UserId     uint64 `json:"userId,omitempty"      description:"发帖用户ID"`
 	Title      string `json:"title,omitempty"       description:"帖子标题"`
@@ -39,7 +39,7 @@ type ForumPostsUpdateRes struct {
 
 // ForumPostsDeleteReq 删除帖子请求
 type ForumPostsDeleteReq struct {
-	g.Meta `path:"/forum/posts/delete" method:"delete" tags:"ForumPosts" summary:"删除帖子"`
+	g.Meta `path:"/forum/posts/delete" method:"delete" tags:"论坛帖子" summary:"删除帖子"`
 	Id     uint64 `json:"id" description:"帖子ID"`
 }
 
@@ -49,7 +49,7 @@ type ForumPostsDeleteRes struct {
 
 // ForumPostsViewReq 查看帖子请求
 type ForumPostsViewReq struct {
-	g.Meta `path:"/forum/posts/view" method:"get" tags:"ForumPosts" summary:"查看帖子"`
+	g.Meta `path:"/forum/posts/view" method:"get" tags:"论坛帖子" summary:"查看帖子"`
 	Id     uint64 `json:"id" description:"帖子ID"`
 }
 
@@ -71,13 +71,11 @@ type ForumPostsViewRes struct {
 // ForumPostsListReq 帖子列表请求
 type ForumPostsListReq struct {
 	response.PageResult
-	g.Meta `path:"/forum/posts/list" method:"get" tags:"ForumPosts" summary:"帖子列表"`
+	g.Meta `path:"/forum/posts/list" method:"get" tags:"论坛帖子" summary:"帖子列表"`
 	UserId uint64 `json:"userId,omitempty" description:"发帖用户ID"`
 	Title  string `json:"title,omitempty"  description:"帖子标题"`
 	Status string `json:"status,omitempty" description:"帖子状态"`
 }
-
-//测试git
 
 // ForumPostsListRes 帖子列表响应
 type ForumPostsListRes struct {

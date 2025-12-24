@@ -21,7 +21,7 @@ type FansListItem struct {
 // FansListReq 粉丝列表请求参数
 type FansListReq struct {
 	response.PageResult
-	g.Meta `path:"/fans/list" method:"get" tags:"Fans" summary:"Fans List"`
+	g.Meta `path:"/fans/list" method:"get" tags:"粉丝" summary:"粉丝列表"`
 	UserId uint64 `json:"userId" v:"required#用户ID不能为空"`
 	Status int    `json:"status" description:"状态：1=粉丝 0=取关/无效"`
 }
@@ -34,7 +34,7 @@ type FansListRes struct {
 
 // FansViewReq 粉丝详情请求参数
 type FansViewReq struct {
-	g.Meta `path:"/fans/view" method:"get" tags:"Fans" summary:"Fans View"`
+	g.Meta `path:"/fans/view" method:"get" tags:"粉丝" summary:"粉丝详情"`
 	Id     uint64 `json:"id" v:"required#粉丝关系ID不能为空"`
 }
 
@@ -45,7 +45,7 @@ type FansViewRes struct {
 
 // FansUpdateReq 粉丝更新请求参数
 type FansUpdateReq struct {
-	g.Meta `path:"/fans/update" method:"put" tags:"Fans" summary:"Fans Update"`
+	g.Meta `path:"/fans/update" method:"put" tags:"粉丝" summary:"更新粉丝"`
 	Id     uint64 `json:"id" v:"required#粉丝关系ID不能为空"`
 	Status int    `json:"status"     description:"状态：1=粉丝 0=取关/无效"`
 	Remark string `json:"remark"     description:"备注名（user_id 对 fan_id 的备注/分组）"`
@@ -58,7 +58,7 @@ type FansUpdateRes struct {
 
 // FansDeleteReq 粉丝删除请求参数
 type FansDeleteReq struct {
-	g.Meta `path:"/fans/delete" method:"delete" tags:"Fans" summary:"Fans Delete"`
+	g.Meta `path:"/fans/delete" method:"delete" tags:"粉丝" summary:"删除粉丝"`
 	Id     uint64 `json:"id" v:"required#粉丝关系ID不能为空"`
 }
 
@@ -68,7 +68,7 @@ type FansDeleteRes struct {
 
 // FansCreateReq 粉丝创建请求参数
 type FansCreateReq struct {
-	g.Meta `path:"/fans/create" method:"post" tags:"Fans" summary:"Fans Create"`
+	g.Meta `path:"/fans/create" method:"post" tags:"粉丝" summary:"创建粉丝"`
 	UserId uint64 `json:"userId" v:"required#用户ID不能为空"`
 	FanId  uint64 `json:"fanId" v:"required#粉丝用户ID不能为空"`
 	Remark string `json:"remark" description:"备注名（user_id 对 fan_id 的备注/分组）"`

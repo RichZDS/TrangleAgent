@@ -20,7 +20,7 @@ type ContainmentRepoInfo struct {
 // List
 type ContainmentRepoListReq struct {
 	response.PageResult
-	g.Meta `path:"/containment/list" method:"get" tags:"Containment" summary:"Containment Repo List"`
+	g.Meta `path:"/containment/list" method:"get" tags:"收容库"  summary:"收容库列表"`
 
 	// 查询条件（全部可选）
 	TerminalId  int    `json:"terminalId"  orm:"terminal_id"  description:"terminal (散逸端)"`
@@ -36,7 +36,7 @@ type ContainmentRepoListRes struct {
 
 // View
 type ContainmentRepoViewReq struct {
-	g.Meta `path:"/containment/view" method:"get" tags:"Containment" summary:"Containment Repo View"`
+	g.Meta `path:"/containment/view" method:"get" tags:"收容库" summary:"收容库详情"`
 
 	Id uint64 `json:"id" orm:"id" description:"primary key"`
 }
@@ -47,7 +47,7 @@ type ContainmentRepoViewRes struct {
 
 // Update（id>0 为修改，id<=0 或不传为新增）
 type ContainmentRepoUpdateReq struct {
-	g.Meta `path:"/containment/update" method:"post" tags:"Containment" summary:"Create or Update Containment Repo"`
+	g.Meta `path:"/containment/update" method:"post" tags:"收容库" summary:"创建或更新收容库"`
 
 	Id          uint64 `json:"id"          orm:"id"           description:"primary key，大于0为修改，其他为新增"`
 	TerminalId  int    `json:"terminalId"  orm:"terminal_id"  description:"terminal (散逸端)"`
@@ -63,7 +63,7 @@ type ContainmentRepoUpdateRes struct {
 
 // Delete
 type ContainmentRepoDeleteReq struct {
-	g.Meta `path:"/containment/delete" method:"delete" tags:"Containment" summary:"Containment Repo Delete"`
+	g.Meta `path:"/containment/delete" method:"delete" tags:"收容库" summary:"收容库删除"`
 
 	Id uint64 `json:"id" orm:"id" description:"primary key"`
 }

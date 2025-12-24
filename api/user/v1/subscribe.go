@@ -21,7 +21,7 @@ type SubscribeListItem struct {
 // SubscribeListReq 关注列表请求参数
 type SubscribeListReq struct {
 	response.PageResult
-	g.Meta   `path:"/subscribe/list" method:"get" tags:"Subscribe" summary:"Subscribe List"`
+	g.Meta   `path:"/subscribe/list" method:"get" tags:"关注" summary:"关注列表"`
 	UserId   uint64 `json:"userId" v:"required#用户ID不能为空"`
 	Status   int    `json:"status" description:"状态：1=关注中 0=取消关注"`
 	FollowId uint64 `json:"followId" description:"被关注的用户ID"`
@@ -35,7 +35,7 @@ type SubscribeListRes struct {
 
 // SubscribeViewReq 关注详情请求参数
 type SubscribeViewReq struct {
-	g.Meta `path:"/subscribe/view" method:"get" tags:"Subscribe" summary:"Subscribe View"`
+	g.Meta `path:"/subscribe/view" method:"get" tags:"关注" summary:"关注详情"`
 	Id     uint64 `json:"id" v:"required#关注关系ID不能为空"`
 }
 
@@ -46,7 +46,7 @@ type SubscribeViewRes struct {
 
 // SubscribeUpdateReq 关注更新请求参数
 type SubscribeUpdateReq struct {
-	g.Meta `path:"/subscribe/update" method:"put" tags:"Subscribe" summary:"Subscribe Update"`
+	g.Meta `path:"/subscribe/update" method:"put" tags:"关注" summary:"更新关注"`
 	Id     uint64 `json:"id" v:"required#关注关系ID不能为空"`
 	Status int    `json:"status"     description:"状态：1=关注中 0=取消关注"`
 	Remark string `json:"remark"     description:"备注名（user_id 对 follow_id 的备注）"`
@@ -59,7 +59,7 @@ type SubscribeUpdateRes struct {
 
 // SubscribeDeleteReq 关注删除请求参数
 type SubscribeDeleteReq struct {
-	g.Meta `path:"/subscribe/delete" method:"delete" tags:"Subscribe" summary:"Subscribe Delete"`
+	g.Meta `path:"/subscribe/delete" method:"delete" tags:"关注" summary:"删除关注"`
 	Id     uint64 `json:"id" v:"required#关注关系ID不能为空"`
 }
 
@@ -69,7 +69,7 @@ type SubscribeDeleteRes struct {
 
 // SubscribeCreateReq 关注创建请求参数
 type SubscribeCreateReq struct {
-	g.Meta   `path:"/subscribe/create" method:"post" tags:"Subscribe" summary:"Subscribe Create"`
+	g.Meta   `path:"/subscribe/create" method:"post" tags:"关注" summary:"创建关注"`
 	UserId   uint64 `json:"userId" v:"required#用户ID不能为空"`
 	FollowId uint64 `json:"followId" v:"required#被关注用户ID不能为空"`
 	Remark   string `json:"remark" description:"备注名（user_id 对 follow_id 的备注）"`

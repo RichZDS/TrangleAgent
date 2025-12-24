@@ -6,7 +6,7 @@ import (
 )
 
 type RoleCreateReq struct {
-	g.Meta       `path:"/role/create" method:"post" tags:"Role" summary:"Create Role"`
+	g.Meta       `path:"/role/create" method:"post" tags:"角色" summary:"创建角色"`
 	UserId       uint64 `json:"userId"         v:"required" description:"所属用户ID"`
 	DepartmentId uint64 `json:"departmentId"   description:"所属部门ID"`
 	AgentName    string `json:"agentName"      v:"required|length:1,50" description:"特工名字"`
@@ -22,7 +22,7 @@ type RoleCreateRes struct {
 }
 
 type RoleUpdateReq struct {
-	g.Meta       `path:"/role/update" method:"put" tags:"Role" summary:"Update Role"`
+	g.Meta       `path:"/role/update" method:"put" tags:"角色" summary:"更新角色"`
 	Id           uint64 `json:"id"             v:"required" description:"角色ID"`
 	DepartmentId uint64 `json:"departmentId"   description:"所属部门ID"`
 	AgentName    string `json:"agentName"      v:"required|length:1,50" description:"特工名字"`
@@ -43,7 +43,7 @@ type RoleUpdateRes struct {
 }
 
 type RoleViewReq struct {
-	g.Meta `path:"/role/view" method:"get" tags:"Role" summary:"View Role"`
+	g.Meta `path:"/role/view" method:"get" tags:"角色" summary:"查看角色"`
 	Id     uint64 `json:"id" v:"required" description:"角色ID"`
 }
 
@@ -78,7 +78,7 @@ type RoleViewParams struct {
 }
 
 type RoleListReq struct {
-	g.Meta `path:"/role/list" method:"get" tags:"Role" summary:"Role List"`
+	g.Meta `path:"/role/list" method:"get" tags:"角色" summary:"角色列表"`
 	response.PageResult
 	UserId       uint64 `json:"userId"       description:"用户ID"`
 	DepartmentId uint64 `json:"departmentId" description:"部门ID"`
@@ -90,7 +90,7 @@ type RoleListRes struct {
 }
 
 type RoleDeleteReq struct {
-	g.Meta `path:"/role/delete" method:"delete" tags:"Role" summary:"Delete Role"`
+	g.Meta `path:"/role/delete" method:"delete" tags:"角色" summary:"删除角色"`
 	Id     uint64 `json:"id" v:"required" description:"角色ID"`
 }
 
@@ -100,7 +100,7 @@ type RoleDeleteRes struct {
 
 // RolePermissionCheckReq 权限查询请求
 type RolePermissionCheckReq struct {
-	g.Meta    `path:"/role/permission/check" method:"post" tags:"Role" summary:"Check Role Permission"`
+	g.Meta    `path:"/role/permission/check" method:"post" tags:"角色" summary:"检查角色权限"`
 	RoleId    uint64 `json:"roleId"    v:"required" description:"角色ID"`
 	FileValue uint   `json:"fileValue" v:"required|min:0|max:40" description:"文件需要的轨道值（0-40）"`
 	TrackType string `json:"trackType" v:"required|in:blue,yellow,red" description:"轨道类型：blue(蓝轨),yellow(黄轨),red(红轨)"`
