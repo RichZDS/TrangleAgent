@@ -9,23 +9,21 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// ChatMessage 聊天消息结构
 type ChatMessage struct {
 	RoomId  string `json:"roomId"`
 	UserId  string `json:"userId"`
 	Message string `json:"message"`
-	Type    string `json:"type"` // join, leave, message
+	Type    string `json:"type"`
 }
 
 var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
 var clients = make(map[*websocket.Conn]bool)
-var broadcast = make(chan ChatMessage, 256) // 使用带缓冲的通道
+var roomClients = make(map[string]map[*websocket.Conn]bool)
+var broadcast = make(chan ChatMessage, 256)
 var mutex = sync.RWMutex{}
-var once sync.Once // 确保广播 goroutine 只启动一次
+var once sync.Once
 
-// HandleChatConnections 处理 WebSocket 连接（适配 GoFrame）
 func HandleChatConnections(r *ghttp.Request) {
-	// 启动广播处理 goroutine（只启动一次）
 	once.Do(func() {
 		go handleBroadcast()
 	})
@@ -43,6 +41,14 @@ func HandleChatConnections(r *ghttp.Request) {
 	defer func() {
 		mutex.Lock()
 		delete(clients, ws)
+		for roomId, members := range roomClients {
+			if _, ok := members[ws]; ok {
+				delete(members, ws)
+				if len(members) == 0 {
+					delete(roomClients, roomId)
+				}
+			}
+		}
 		mutex.Unlock()
 		ws.Close()
 	}()
@@ -54,7 +60,28 @@ func HandleChatConnections(r *ghttp.Request) {
 			log.Printf("read error: %v", err)
 			break
 		}
-		// 将消息发送到广播通道
+
+		switch msg.Type {
+		case "join":
+			mutex.Lock()
+			members, ok := roomClients[msg.RoomId]
+			if !ok {
+				members = make(map[*websocket.Conn]bool)
+				roomClients[msg.RoomId] = members
+			}
+			members[ws] = true
+			mutex.Unlock()
+		case "leave":
+			mutex.Lock()
+			if members, ok := roomClients[msg.RoomId]; ok {
+				delete(members, ws)
+				if len(members) == 0 {
+					delete(roomClients, msg.RoomId)
+				}
+			}
+			mutex.Unlock()
+		}
+
 		select {
 		case broadcast <- msg:
 		default:
@@ -63,19 +90,26 @@ func HandleChatConnections(r *ghttp.Request) {
 	}
 }
 
-// handleBroadcast 处理消息广播
 func handleBroadcast() {
 	for {
 		msg := <-broadcast
 		mutex.RLock()
-		for client := range clients {
+		members, ok := roomClients[msg.RoomId]
+		if !ok {
+			mutex.RUnlock()
+			continue
+		}
+		for client := range members {
 			err := client.WriteJSON(msg)
 			if err != nil {
 				log.Printf("write error: %v", err)
 				client.Close()
 				mutex.RUnlock()
 				mutex.Lock()
-				delete(clients, client)
+				delete(members, client)
+				if len(members) == 0 {
+					delete(roomClients, msg.RoomId)
+				}
 				mutex.Unlock()
 				mutex.RLock()
 			}

@@ -226,3 +226,27 @@ func (s *sRoom) RoomCreate(ctx context.Context, req *v1.RoomCreateReq) (res *v1.
 
 	return res, nil
 }
+
+func (s *sRoom) RoomJoin(ctx context.Context, req *v1.RoomJoinReq) (res *v1.RoomJoinRes, err error) {
+	if req.RoomId == 0 {
+		return nil, nil
+	}
+
+	var room *entity.TrpgRoom
+	err = dao.TrpgRoom.Ctx(ctx).
+		Where(dao.TrpgRoom.Columns().Id, req.RoomId).
+		Scan(&room)
+	if err != nil {
+		return nil, err
+	}
+	if room == nil {
+		return nil, nil
+	}
+
+	res = &v1.RoomJoinRes{
+		Id:       room.Id,
+		RoomCode: room.RoomCode,
+	}
+
+	return res, nil
+}

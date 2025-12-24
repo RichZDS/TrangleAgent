@@ -3,8 +3,9 @@ package ws
 import (
 	"encoding/json"
 
-	"github.com/gogf/gf/v2/net/ghttp"
 	chatmodel "leke/ws/model"
+
+	"github.com/gogf/gf/v2/net/ghttp"
 )
 
 // Client 表示一个在线用户的 WebSocket 连接
@@ -58,11 +59,3 @@ func (c *Client) EnqueueMessage(msg *chatmodel.ChatMessage) error {
 	}
 	return nil
 }
-
-// 你可以后面定义一个写循环，从 Send 里取数据写回客户端。
-// func (c *Client) WriteLoop() {
-//     defer c.Conn.Close()
-//     for data := range c.Send {
-//         _ = c.Conn.WriteMessage(websocket.TextMessage, data)
-//     }
-// }
